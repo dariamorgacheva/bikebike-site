@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>bikebike</title>
+<meta name="description" content="bikebike — improvisational trio. Corey Cosman, Dorraa, Stefan Hegerat." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bungee&family=DM+Mono:wght@400;500&family=Rubik+Mono+One&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f1ece0;
+    --paper-deep: #e6dfcc;
+    --ink: #0d0d0d;
+    --teal: #00c2b8;
+    --magenta: #ff1a6b;
+    --yellow-warn: #f5e663;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Mono', monospace;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Paper grain via SVG noise */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.15 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: multiply;
+  }
+
+  /* Square-wave river background — fixed */
+  .river {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 1;
+  }
+  .river path {
+    fill: none;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+    stroke-dasharray: 4500;
+    stroke-dashoffset: 4500;
+    animation: march 16s linear infinite;
+  }
+  .river path.w1 { stroke: var(--teal);    stroke-width: 6;  animation-duration: 14s; }
+  .river path.w2 { stroke: var(--magenta); stroke-width: 8;  animation-duration: 18s; animation-delay: -3s; }
+  .river path.w3 { stroke: var(--teal);    stroke-width: 4;  animation-duration: 22s; animation-delay: -7s; opacity: 0.7; }
+  .river path.w4 { stroke: var(--magenta); stroke-width: 5;  animation-duration: 20s; animation-delay: -10s; }
+  .river path.w5 { stroke: var(--ink);     stroke-width: 3;  animation-duration: 26s; animation-delay: -5s; opacity: 0.5; }
+
+  @keyframes march {
+    0%   { stroke-dashoffset: 4500; }
+    100% { stroke-dashoffset: -4500; }
+  }
+
+  /* Layout */
+  main {
+    position: relative;
+    z-index: 2;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 32px 48px 60px;
+  }
+
+  /* Top nav */
+  nav.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 60px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  nav.top .mark {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 24px;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    background: var(--paper);
+    padding: 4px 8px;
+    border: 2px solid var(--ink);
+  }
+  nav.top ul {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+    flex-wrap: wrap;
+  }
+  nav.top li a {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 6px 10px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    transition: all 0.15s ease;
+  }
+  nav.top li:nth-child(odd) a { transform: rotate(-1.5deg); }
+  nav.top li:nth-child(even) a { transform: rotate(1.5deg); }
+  nav.top li a:hover {
+    background: var(--magenta);
+    color: var(--paper);
+    transform: rotate(0deg) scale(1.05);
+  }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    padding: 60px 0 100px;
+  }
+
+  .hero h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-weight: 900;
+    font-size: clamp(80px, 19vw, 280px);
+    line-height: 0.82;
+    letter-spacing: -0.06em;
+    color: var(--ink);
+    text-transform: lowercase;
+    position: relative;
+  }
+  .hero h1::before,
+  .hero h1::after {
+    content: 'bikebike';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+  }
+  .hero h1::before {
+    color: var(--teal);
+    transform: translate(-6px, 4px);
+    z-index: -1;
+    mix-blend-mode: multiply;
+  }
+  .hero h1::after {
+    color: var(--magenta);
+    transform: translate(5px, -3px);
+    z-index: -2;
+    mix-blend-mode: multiply;
+  }
+
+  .hero .meta {
+    margin-top: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .hero .tagline-block {
+    max-width: 600px;
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    padding: 18px 22px;
+    transform: rotate(-1deg);
+    box-shadow: 8px 8px 0 var(--magenta);
+  }
+  .hero .tagline-block .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--ink);
+    background: var(--teal);
+    padding: 3px 8px;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+  .hero .tagline-block p {
+    font-family: 'VT323', monospace;
+    font-size: clamp(20px, 2.4vw, 28px);
+    line-height: 1.15;
+    color: var(--ink);
+  }
+
+  .hero .sticker {
+    font-family: 'Bungee', sans-serif;
+    background: var(--magenta);
+    color: var(--paper);
+    padding: 12px 16px;
+    transform: rotate(8deg);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    align-self: center;
+    box-shadow: 6px 6px 0 var(--ink);
+    border: 2px solid var(--ink);
+  }
+  .hero .sticker .big {
+    display: block;
+    font-size: 28px;
+    line-height: 1;
+    margin-top: 4px;
+  }
+
+  /* Section common */
+  section {
+    padding: 100px 0;
+    position: relative;
+  }
+  .section-tag {
+    font-family: 'Bungee', sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--paper);
+    background: var(--ink);
+    display: inline-block;
+    padding: 6px 14px;
+    margin-bottom: 30px;
+    transform: rotate(-1.5deg);
+    border: 2px solid var(--ink);
+  }
+  .section-tag.teal { background: var(--teal); color: var(--ink); }
+  .section-tag.mag  { background: var(--magenta); color: var(--paper); }
+
+  h2 {
+    font-family: 'Rubik Mono One', sans-serif;
+    font-size: clamp(36px, 5.5vw, 72px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 50px;
+    max-width: 900px;
+    text-transform: lowercase;
+  }
+  h2 .hl-teal { background: var(--teal); padding: 0 6px; }
+  h2 .hl-mag  { background: var(--magenta); color: var(--paper); padding: 0 6px; }
+
+  /* About — ransom note */
+  .about .ransom {
+    max-width: 880px;
+    line-height: 1.5;
+    background: var(--paper);
+    padding: 16px;
+    border: 3px solid var(--ink);
+    box-shadow: 10px 10px 0 var(--teal);
+  }
+  .about .ransom span {
+    display: inline-block;
+    padding: 2px 6px;
+    margin: 3px 2px;
+    border: 1.5px solid var(--ink);
+    background: var(--paper);
+  }
+  .about .ransom span:nth-child(3n)   { font-family: 'Archivo Black', sans-serif; font-size: 22px; transform: rotate(-2deg); }
+  .about .ransom span:nth-child(3n+1) { font-family: 'VT323', monospace;          font-size: 26px; }
+  .about .ransom span:nth-child(3n+2) { font-family: 'Bungee', sans-serif;        font-size: 18px; transform: rotate(1.5deg); }
+  .about .ransom span:nth-child(5n)   { background: var(--teal); }
+  .about .ransom span:nth-child(7n)   { background: var(--magenta); color: var(--paper); }
+  .about .ransom span:nth-child(11n)  { background: var(--ink); color: var(--paper); }
+
+  /* Members */
+  .members-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .member {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    padding: 28px 24px;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .member.m1 { transform: rotate(-1.5deg); box-shadow: 8px 8px 0 var(--magenta); }
+  .member.m2 { transform: rotate(1deg);    box-shadow: 8px 8px 0 var(--teal); }
+  .member.m3 { transform: rotate(-0.5deg); box-shadow: 8px 8px 0 var(--ink); }
+  .member:hover {
+    transform: rotate(0) translate(-2px, -2px);
+    box-shadow: 12px 12px 0 var(--ink);
+  }
+
+  .member .fractal {
+    width: 100%;
+    aspect-ratio: 1;
+    margin-bottom: 20px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    display: block;
+  }
+  .member .name {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 26px;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+    text-transform: lowercase;
+  }
+  .member .inst {
+    font-family: 'Bungee', sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 4px 8px;
+    display: inline-block;
+  }
+  .member.m1 .inst { background: var(--magenta); }
+  .member.m2 .inst { background: var(--teal); color: var(--ink); }
+  .member.m3 .inst { background: var(--ink); }
+
+  /* Shows */
+  .show-row {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 28px;
+    align-items: center;
+    transition: all 0.2s ease;
+  }
+  .show-row:hover {
+    background: var(--ink);
+    color: var(--paper);
+    transform: translate(-3px, -3px);
+    box-shadow: 6px 6px 0 var(--magenta);
+  }
+  .show-row:hover .date { background: var(--magenta); color: var(--paper); }
+  .show-row:hover .venue { color: var(--teal); }
+  .show-row .date {
+    font-family: 'Bungee', sans-serif;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    background: var(--teal);
+    color: var(--ink);
+    padding: 8px 12px;
+    border: 2px solid var(--ink);
+  }
+  .show-row .event {
+    font-family: 'Rubik Mono One', sans-serif;
+    font-size: clamp(20px, 2.8vw, 32px);
+    text-transform: lowercase;
+    letter-spacing: -0.01em;
+  }
+  .show-row .venue {
+    font-family: 'VT323', monospace;
+    font-size: 22px;
+  }
+
+  /* Listen / videos */
+  .videos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .video-wrap {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: var(--ink);
+    border: 3px solid var(--ink);
+    overflow: hidden;
+    transition: all 0.2s ease;
+  }
+  .video-wrap:nth-child(1) { box-shadow: 6px 6px 0 var(--teal); }
+  .video-wrap:nth-child(2) { box-shadow: 6px 6px 0 var(--magenta); }
+  .video-wrap:nth-child(3) { box-shadow: 6px 6px 0 var(--ink); }
+  .video-wrap:hover { transform: translate(-3px, -3px); }
+  .video-wrap iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  /* Footer / contact */
+  footer {
+    position: relative;
+    z-index: 2;
+    margin-top: 60px;
+    padding: 60px 48px;
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    border-top: 4px double var(--ink);
+    background: var(--paper);
+  }
+  .contact-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 40px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+  }
+  footer .contact .label {
+    font-family: 'Bungee', sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    background: var(--magenta);
+    color: var(--paper);
+    padding: 4px 10px;
+    margin-bottom: 16px;
+    display: inline-block;
+    border: 2px solid var(--ink);
+  }
+  footer .contact a.email {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(24px, 3.8vw, 48px);
+    color: var(--ink);
+    text-decoration: none;
+    letter-spacing: -0.03em;
+    display: inline-block;
+    border-bottom: 5px solid var(--teal);
+    line-height: 1.1;
+    word-break: break-word;
+  }
+  footer .contact a.email:hover {
+    background: var(--ink);
+    color: var(--teal);
+  }
+  footer .social {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  footer .social a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 16px;
+    border: 3px solid var(--ink);
+    background: var(--paper);
+    text-decoration: none;
+    color: var(--ink);
+    font-family: 'Bungee', sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: all 0.15s ease;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  footer .social a:hover {
+    background: var(--teal);
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--magenta);
+  }
+
+  footer .copyright {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    opacity: 0.6;
+    padding-top: 24px;
+    border-top: 1px dashed var(--ink);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* Floating sierpinski decorations */
+  .deco-frac {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.9;
+  }
+  .deco-frac.d1 { top: 5%;  right: -40px; width: 200px; transform: rotate(15deg); }
+  .deco-frac.d2 { bottom: 10%; left: -30px; width: 160px; transform: rotate(-25deg); }
+  .deco-frac.d3 { top: 40%; right: 5%; width: 120px; opacity: 0.5; }
+
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  .deco-frac.d3 { animation: spin-slow 60s linear infinite; }
+
+  /* Mobile */
+  @media (max-width: 760px) {
+    main { padding: 20px 18px 50px; }
+    nav.top { padding-bottom: 40px; }
+    nav.top li a { font-size: 11px; padding: 4px 7px; }
+    .hero { padding: 30px 0 60px; }
+    section { padding: 70px 0; }
+    .members-grid { grid-template-columns: 1fr; }
+    .videos { grid-template-columns: 1fr; }
+    .show-row { grid-template-columns: 1fr; gap: 10px; }
+    footer { padding: 40px 18px; }
+    .deco-frac { display: none; }
+    .contact-row { align-items: flex-start; }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .river path { animation: none; stroke-dashoffset: 0; opacity: 0.6; }
+    .deco-frac.d3 { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Square-wave river -->
+<svg class="river" viewBox="0 0 1600 2400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <path class="w1" d="M -50,200 L 100,200 L 100,260 L 250,260 L 250,180 L 400,180 L 400,240 L 550,240 L 550,200 L 700,200 L 700,280 L 850,280 L 850,200 L 1000,200 L 1000,250 L 1150,250 L 1150,190 L 1300,190 L 1300,240 L 1450,240 L 1450,200 L 1650,200" />
+  <path class="w2" d="M -50,600 L 80,600 L 80,540 L 220,540 L 220,640 L 360,640 L 360,560 L 500,560 L 500,620 L 640,620 L 640,540 L 780,540 L 780,640 L 920,640 L 920,560 L 1060,560 L 1060,620 L 1200,620 L 1200,540 L 1340,540 L 1340,620 L 1480,620 L 1480,580 L 1650,580" />
+  <path class="w3" d="M -50,1100 L 120,1100 L 120,1180 L 280,1180 L 280,1050 L 440,1050 L 440,1150 L 600,1150 L 600,1080 L 760,1080 L 760,1170 L 920,1170 L 920,1090 L 1080,1090 L 1080,1150 L 1240,1150 L 1240,1080 L 1400,1080 L 1400,1160 L 1560,1160 L 1560,1100 L 1650,1100" />
+  <path class="w4" d="M -50,1600 L 110,1600 L 110,1540 L 270,1540 L 270,1660 L 430,1660 L 430,1580 L 590,1580 L 590,1640 L 750,1640 L 750,1560 L 910,1560 L 910,1660 L 1070,1660 L 1070,1580 L 1230,1580 L 1230,1660 L 1390,1660 L 1390,1600 L 1550,1600 L 1550,1640 L 1650,1640" />
+  <path class="w5" d="M -50,2050 L 130,2050 L 130,2120 L 290,2120 L 290,2000 L 450,2000 L 450,2090 L 610,2090 L 610,2020 L 770,2020 L 770,2110 L 930,2110 L 930,2030 L 1090,2030 L 1090,2100 L 1250,2100 L 1250,2030 L 1410,2030 L 1410,2100 L 1570,2100 L 1570,2060 L 1650,2060" />
+</svg>
+
+<!-- Sierpinski SVG defs (reusable) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="sierpinski" viewBox="0 0 256 222">
+      <polygon points="128,0 256,222 0,222" fill="currentColor"/>
+      <polygon points="128,111 64,222 192,222" fill="var(--paper)"/>
+      <polygon points="64,111 32,166 96,166" fill="var(--paper)"/>
+      <polygon points="192,111 160,166 224,166" fill="var(--paper)"/>
+      <polygon points="128,0 96,55 160,55" fill="var(--paper)"/>
+      <polygon points="32,166 16,194 48,194" fill="var(--paper)"/>
+      <polygon points="96,166 80,194 112,194" fill="var(--paper)"/>
+      <polygon points="160,166 144,194 176,194" fill="var(--paper)"/>
+      <polygon points="224,166 208,194 240,194" fill="var(--paper)"/>
+      <polygon points="64,111 48,138 80,138" fill="var(--paper)"/>
+      <polygon points="128,111 112,138 144,138" fill="var(--paper)"/>
+      <polygon points="192,111 176,138 208,138" fill="var(--paper)"/>
+      <polygon points="96,55 80,83 112,83" fill="var(--paper)"/>
+      <polygon points="160,55 144,83 176,83" fill="var(--paper)"/>
+      <polygon points="128,0 112,27 144,27" fill="var(--paper)"/>
+    </symbol>
+  </defs>
+</svg>
+
+<main>
+  <nav class="top">
+    <div class="mark">bikebike</div>
+    <ul>
+      <li><a href="#about">about</a></li>
+      <li><a href="#trio">trio</a></li>
+      <li><a href="#shows">shows</a></li>
+      <li><a href="#listen">listen</a></li>
+      <li><a href="#contact">contact</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero">
+    <svg class="deco-frac d1" viewBox="0 0 256 222" style="color: var(--magenta);"><use href="#sierpinski"/></svg>
+    <svg class="deco-frac d3" viewBox="0 0 256 222" style="color: var(--teal);"><use href="#sierpinski"/></svg>
+
+    <h1>bikebike</h1>
+
+    <div class="meta">
+      <div class="tagline-block">
+        <span class="label">// trio / toronto</span>
+        <p>improvisational. multi-idiomatic. dance-oriented. digging for the moment.</p>
+      </div>
+      <div class="sticker">
+        live<span class="big">★ now ★</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="about">
+    <span class="section-tag">file_01 // about</span>
+    <h2>multi-idiomatic <span class="hl-teal">music.</span> eclecticism of <span class="hl-mag">rhythm.</span></h2>
+    <p class="ransom">
+      <span>with</span><span>an</span><span>improvisational</span><span>model,</span><span>bikebike</span><span>explores</span><span>multi-</span><span>idiomatic</span><span>music,</span><span>with</span><span>an</span><span>eclecticism</span><span>of</span><span>rhythm</span><span>and</span><span>dance</span><span>oriented</span><span>composition</span><span>—</span><span>cultivating</span><span>the</span><span>spirit</span><span>of</span><span>the</span><span>moment</span><span>with</span><span>a</span><span>general</span><span>sense</span><span>of</span><span>digging</span><span>for</span><span>something</span><span>interesting</span><span>to</span><span>discover,</span><span>and</span><span>groove</span><span>out</span><span>to.</span>
+    </p>
+  </section>
+
+  <section id="trio">
+    <svg class="deco-frac d2" viewBox="0 0 256 222" style="color: var(--teal);"><use href="#sierpinski"/></svg>
+    <span class="section-tag teal">file_02 // the trio</span>
+    <h2>three players. <span class="hl-mag">one room.</span></h2>
+    <div class="members-grid">
+      <div class="member m1">
+        <svg class="fractal" viewBox="0 0 256 222" style="color: var(--magenta);"><use href="#sierpinski"/></svg>
+        <div class="name">corey<br>cosman</div>
+        <span class="inst">bass</span>
+      </div>
+      <div class="member m2">
+        <svg class="fractal" viewBox="0 0 256 222" style="color: var(--teal); transform: rotate(180deg);"><use href="#sierpinski"/></svg>
+        <div class="name">dorraa</div>
+        <span class="inst">keys</span>
+      </div>
+      <div class="member m3">
+        <svg class="fractal" viewBox="0 0 256 222" style="color: var(--ink);"><use href="#sierpinski"/></svg>
+        <div class="name">stefan<br>hegerat</div>
+        <span class="inst">drums</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="shows">
+    <span class="section-tag mag">file_03 // shows</span>
+    <h2>where we <span class="hl-teal">play.</span></h2>
+    <div class="show-row">
+      <div class="date">mar / 2026</div>
+      <div class="event">wavelength festival</div>
+      <div class="venue">~ toronto</div>
+    </div>
+    <div class="show-row">
+      <div class="date">tba</div>
+      <div class="event">next show coming soon</div>
+      <div class="venue">~ stay tuned</div>
+    </div>
+  </section>
+
+  <section id="listen">
+    <span class="section-tag">file_04 // listen</span>
+    <h2>recent <span class="hl-mag">recordings.</span></h2>
+    <div class="videos">
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/ArNRcx_zeDs" title="bikebike video 1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/wmkkh7vmrzc" title="bikebike video 2" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/P0z9s877LoI" title="bikebike video 3" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer id="contact">
+  <div class="contact-row">
+    <div class="contact">
+      <span class="label">bookings ▸</span><br>
+      <a class="email" href="mailto:music.bikebike@gmail.com">music.bikebike@gmail.com</a>
+    </div>
+    <div class="social">
+      <a href="https://bikebikemusic.bandcamp.com/" target="_blank" rel="noopener">bandcamp →</a>
+      <a href="https://www.instagram.com/bikebike.music/" target="_blank" rel="noopener">instagram →</a>
+    </div>
+  </div>
+  <div class="copyright">
+    <span>© bikebike // 2026</span>
+    <span>// toronto / on</span>
+    <span>// signal ◢◤ noise</span>
+  </div>
+</footer>
+
+</body>
+</html>
